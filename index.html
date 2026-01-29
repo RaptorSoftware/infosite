@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информационный сайт</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="FaviconLogo.ico" type="image/x-icon">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7d2ae8;
+            --space-bg: #010103;
+        }
+
+        @media (pointer: fine) {
+            * { cursor: none !important; }
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--space-bg);
+            color: white;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+
+        #planet-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.95) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #cursor {
+            width: 8px; height: 8px; background: var(--primary);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000;
+            box-shadow: 0 0 20px var(--primary);
+        }
+        #cursor-follower {
+            width: 40px; height: 40px; border: 1px solid var(--primary);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999;
+            transition: transform 0.1s ease-out;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .step-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .text-huge { font-size: 3.5rem !important; }
+            #cursor, #cursor-follower { display: none; }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+    <div class="vignette"></div>
+    <canvas id="planet-canvas"></canvas>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 top-0 px-4 md:px-10 py-6" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass rounded-[30px] px-6 py-4">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center justify-center">
+                    
+                </div>
+                <span class="font-cyber text-xl font-black tracking-widest hidden sm:block">RAPTOR<span class="text-cyan-400">.SW</span></span>
+            </div>
+            <div class="flex gap-6 md:gap-12 text-[10px] font-black uppercase tracking-[2px]">
+                <a href="#about" class="hover:text-cyan-400 transition">Миссия</a>
+                <a href="#capabilities" class="hover:text-cyan-400 transition">Технологии</a>
+                <a href="#partner" class="hover:text-cyan-400 transition">О партнере</a>
+            </div>
+            <button onclick="requestGyro()" class="w-10 h-10 glass rounded-full flex items-center justify-center border-cyan-500/30 border">
+                <i class="fas fa-fingerprint text-cyan-400"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
+        <div data-aos="zoom-out" data-aos-duration="2000" class="z-10">
+            <h1 class="text-huge text-6xl md:text-[11rem] font-cyber font-black leading-none mb-8 tracking-tighter">
+                NEURAL <span class="text-gradient italic">CORE</span>
+            </h1>
+            <p class="text-lg md:text-2xl font-light opacity-50 max-w-3xl mx-auto mb-12 leading-relaxed">
+                Погрузитесь в архитектуру Raptor Software. <br> Листайте, чтобы войти в ядро Velton AI.
+            </p>
+            <div class="flex justify-center gap-6">
+                <a href="#about" class="px-12 py-5 bg-cyan-500 text-black font-black uppercase tracking-widest text-[10px] rounded-full hover:scale-110 transition shadow-[0_0_30px_rgba(0,242,255,0.4)]">Инициализация</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-40 px-6 max-w-5xl mx-auto relative z-10 text-center">
+        <div data-aos="fade-up">
+            <span class="text-purple-500 font-bold tracking-[15px] uppercase text-[10px] mb-6 block">Genesis Report 2025</span>
+            <h2 class="text-5xl md:text-8xl font-cyber font-bold mb-12 leading-tight uppercase">МЫ СОЗДАЕМ <br><span class="text-gradient">БУДУЩЕЕ</span></h2>
+            <p class="text-xl md:text-3xl opacity-60 mb-10 leading-relaxed font-light">
+                Raptor Software специализируется на разработке программного обеспечения и встраиваемых устройств. Мы проектируем и реализуем решения на базе Arduino и Raspberry Pi, объединяя программирование, электронику и современные технологии. Помогаем превратить идею в надёжный и функциональный продукт.
+            </p>
+            <p class="text-lg opacity-40 mb-16 leading-loose max-w-3xl mx-auto">
+                VeltonAI — наш флагманский продукт в области искусственного интеллекта, одно из лучших решений в своём сегменте.
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="p-8 glass rounded-[30px] border-b-2 border-cyan-500">
+                    <div class="text-3xl font-cyber text-cyan-400 mb-2">500+</div>
+                    <div class="text-[8px] uppercase font-bold opacity-30 tracking-widest">Active Nodes</div>
+                </div>
+                <div class="p-8 glass rounded-[30px] border-b-2 border-purple-500">
+                    <div class="text-3xl font-cyber text-purple-500 mb-2">0.2ms</div>
+                    <div class="text-[8px] uppercase font-bold opacity-30 tracking-widest">Neural Sync</div>
+                </div>
+                <div class="p-8 glass rounded-[30px] border-b-2 border-cyan-500">
+                    <div class="text-3xl font-cyber text-cyan-400 mb-2">99.9%</div>
+                    <div class="text-[8px] uppercase font-bold opacity-30 tracking-widest">AI Accuracy</div>
+                </div>
+                <div class="p-8 glass rounded-[30px] border-b-2 border-purple-500">
+                    <div class="text-3xl font-cyber text-purple-500 mb-2">∞</div>
+                    <div class="text-[8px] uppercase font-bold opacity-30 tracking-widest">Data Fusion</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- CAPABILITIES GRID -->
+    <section id="capabilities" class="py-40 px-6 relative z-10 bg-black/20">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-32" data-aos="fade-up">
+                <h2 class="text-5xl md:text-8xl font-cyber font-black mb-6 uppercase italic">Компетенции</h2>
+                <div class="w-24 h-1 bg-cyan-500 mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass p-10 rounded-[40px] step-card transition duration-500" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-brain text-4xl text-cyan-400 mb-8"></i>
+                    <h3 class="text-2xl font-cyber mb-4">Neural Design</h3>
+                    <p class="opacity-50 text-sm leading-relaxed">Проектирование уникальных топологий нейросетей под специфические бизнес-задачи любой сложности.</p>
+                </div>
+                <div class="glass p-10 rounded-[40px] step-card transition duration-500" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-shield-alt text-4xl text-purple-500 mb-8"></i>
+                    <h3 class="text-2xl font-cyber mb-4">Cyber Defense</h3>
+                    <p class="opacity-50 text-sm leading-relaxed">Интеграция ИИ-протоколов безопасности, способных предсказывать и блокировать угрозы до их возникновения.</p>
+                </div>
+                <div class="glass p-10 rounded-[40px] step-card transition duration-500" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-project-diagram text-4xl text-cyan-400 mb-8"></i>
+                    <h3 class="text-2xl font-cyber mb-4">Data Fusion</h3>
+                    <p class="opacity-50 text-sm leading-relaxed">Объединение разрозненных потоков данных в единую когнитивную систему принятия решений.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+    <!-- PARTNER SECTION -->
+<section id="partner" class="py-40 px-6 relative z-10">
+    <div class="max-w-6xl mx-auto glass rounded-[60px] md:rounded-[100px] p-16 md:p-32 text-center" data-aos="zoom-in">
+        <span class="text-cyan-400 font-black tracking-[15px] uppercase text-[10px] mb-8 block">
+            Strategic Alliance
+        </span>
+
+        <h2 class="text-6xl md:text-9xl font-cyber font-black mb-10 italic tracking-tighter">
+            MAGIC <br><span class="text-gradient">NETWORKS</span>
+        </h2>
+
+        <p class="text-xl md:text-3xl opacity-60 mb-4 font-light max-w-4xl mx-auto">
+            «Скорость света была пределом. Мы превратили её в отправную точку для VeltonAI».
+        </p>
+
+        <p class="text-sm md:text-base opacity-40 lowercase mb-16">
+            высокопроизводительные серверы для работы VeltonAI.
+        </p>
+
+        <div class="flex justify-center gap-16 text-5xl opacity-20">
+            <i class="fab fa-python"></i>
+            <i class="fas fa-project-diagram"></i>
+            <i class="fab fa-linux"></i>
+        </div>
+    </div>
+</section>
+
+    <footer class="py-20 px-10 border-t border-white/5 glass relative z-10 text-center md:text-left">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+            <div>
+                <div class="font-cyber text-2xl font-black">RAPTOR<span class="text-cyan-400">.SW</span></div>
+                <p class="text-[9px] opacity-30 uppercase tracking-[5px] mt-2">Neural Intelligence Ecosystem</p>
+            </div>
+            <div class="flex gap-10 text-2xl opacity-40">
+                <a href="https://github.com/RaptorSoftware" class="hover:text-cyan-400 transition"><i class="fab fa-github"></i></a>
+            </div>
+            <div class="text-[9px] opacity-30 font-bold uppercase tracking-[3px]">
+                Status: Hyper-Active<br>
+                © 2026 Raptor Software
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: false });
+
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+        let mouseX = 0, mouseY = 0;
+        let scrollY = 0;
+        let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if(!isMobile) {
+                document.getElementById('cursor').style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+                document.getElementById('cursor-follower').style.transform = `translate3d(${mouseX - 20}px, ${mouseY - 20}px, 0)`;
+            }
+        });
+
+        window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+        // --- ГИРОСКОП ---
+        let gyroX = 0, gyroY = 0;
+        function requestGyro() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(s => {
+                    if (s === 'granted') window.addEventListener('deviceorientation', e => {
+                        gyroX = e.beta * 0.05; gyroY = e.gamma * 0.05;
+                    });
+                });
+            } else {
+                window.addEventListener('deviceorientation', e => {
+                    gyroX = e.beta * 0.05; gyroY = e.gamma * 0.05;
+                });
+            }
+        }
+
+        // --- THREE.JS: THE NEURAL ENGINE ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.getElementById('planet-canvas'), 
+            alpha: true, antialias: true 
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // 1. Космическая пыль (Звезды)
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 15000;
+        const posArray = new Float32Array(starsCount * 3);
+        for(let i=0; i < starsCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 160;
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starsMat = new THREE.PointsMaterial({ size: 0.012, color: 0xffffff, transparent: true, opacity: 0.4 });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // 2. Внешняя оболочка (Shell)
+        const shellGeo = new THREE.SphereGeometry(3.5, 64, 64);
+        const shellMat = new THREE.MeshStandardMaterial({
+            color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending
+        });
+        const shell = new THREE.Mesh(shellGeo, shellMat);
+        scene.add(shell);
+
+        // 3. ГУСТАЯ НЕЙРОННАЯ СЕТЬ (Core)
+        const coreGroup = new THREE.Group();
+        const nodeCount = 350; // Увеличено в 4+ раза для "густоты"
+        const nodes = [];
+        
+        for(let i=0; i<nodeCount; i++) {
+            const node = new THREE.Vector3(
+                (Math.random() - 0.5) * 4,
+                (Math.random() - 0.5) * 4,
+                (Math.random() - 0.5) * 4
+            );
+            nodes.push(node);
+        }
+
+        // Линии связей (алгоритм близости)
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.15 });
+        nodes.forEach((p1, i) => {
+            nodes.slice(i + 1).forEach(p2 => {
+                if(p1.distanceTo(p2) < 0.7) { // Максимальная плотность связей
+                    const lineGeo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+                    const line = new THREE.Line(lineGeo, lineMat);
+                    coreGroup.add(line);
+                }
+            });
+        });
+
+        // Светящиеся узлы
+        const pointsMat = new THREE.PointsMaterial({ size: 0.03, color: 0x7d2ae8, blending: THREE.AdditiveBlending });
+        const pointsGeo = new THREE.BufferGeometry().setFromPoints(nodes);
+        const points = new THREE.Points(pointsGeo, pointsMat);
+        coreGroup.add(points);
+        scene.add(coreGroup);
+
+        const light = new THREE.PointLight(0x00f2ff, 1.5);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x202020));
+
+        camera.position.z = 10;
+
+        // --- ANIMATION LOOP ---
+        let targetX = 0, targetY = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Параллакс (Мышь / Гироскоп)
+            if (isMobile) {
+                targetX += (gyroY - targetX) * 0.05;
+                targetY += (gyroX - targetY) * 0.05;
+            } else {
+                targetX += ((mouseX / window.innerWidth - 0.5) - targetX) * 0.05;
+                targetY += ((mouseY / window.innerHeight - 0.5) - targetY) * 0.05;
+            }
+
+            camera.position.x += (targetX * 4 - camera.position.x) * 0.05;
+            camera.position.y += (-targetY * 4 - camera.position.y) * 0.05;
+
+            // Вращение
+            shell.rotation.y += 0.001;
+            coreGroup.rotation.y -= 0.002;
+            coreGroup.rotation.z += 0.001;
+            stars.rotation.y += 0.0001;
+
+            // ЭФФЕКТ ПОГРУЖЕНИЯ ПРИ СКРОЛЛЕ
+            // Начальная Z=10, конечная при скролле уходит в -5 (вглубь нейронов)
+            const zoom = 10 - (scrollY * 0.012);
+            camera.position.z += (zoom - camera.position.z) * 0.1;
+
+            // Визуальные переходы оболочки
+            shell.material.opacity = Math.max(0, (camera.position.z - 1) * 0.05);
+            pointsMat.color.setHSL(0.7, 0.8, 0.5 + Math.sin(Date.now()*0.001)*0.2);
+
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
